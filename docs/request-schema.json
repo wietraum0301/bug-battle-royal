@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "to":       { "type": "string" },
+    "subject":  { "type": "string" },
+    "html":     { "type": "string" },
+    "day":      { "type": "string" },
+    "dayLabel": { "type": "string" },
+    "dedupKey": { "type": "string" },
+    "resend":   { "type": "boolean" },
+    "prize":    { "type": "string" },
+    "coupon":   { "type": "string" },
+    "bug":      { "type": "string" },
+    "venue":    { "type": "string" },
+    "address":  { "type": "string" },
+    "time":     { "type": "string" },
+    "user": {
+      "type": "object",
+      "properties": {
+        "name":      { "type": "string" },
+        "company":   { "type": "string" },
+        "role":      { "type": "string" },
+        "email":     { "type": "string" },
+        "phone":     { "type": "string" },
+        "marketing": { "type": "boolean" }
+      }
+    }
+  }
+}

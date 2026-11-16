@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#121310">
+<title>BUG ROYALE | GitHub Copilot × G-STAR Developer Night</title>
+<meta name="description" content="11/19(목)·11/20(금) 17시 해운대 GitHub Copilot 팝업 네트워킹. 1.7초 PiC MAN 버그 먹기 룰렛으로 안주 쿠폰 받기 — 맥주·타코·퀘사디아 무료 (기업 인증 방문객 only)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="🪂 BUG ROYALE — GitHub Copilot × G-STAR Developer Night">
+<meta property="og:description" content="1.7초 PiC MAN 버그 먹기 룰렛 🎯 맥주·타코·퀘사디아 무료, 하몽&amp;멜론 플래터까지! 11/19 올데이라운지 · 11/20 리리코이">
+<style>
+:root{
+  --bg:#0d1117; --bg2:#161b22; --card:#1c2230; --line:#30363d;
+  --fg:#e6edf3; --muted:#8b949e; --accent:#a371f7; --accent2:#3fb950;
+  --pink:#f778ba; --blue:#58a6ff; --warn:#f85149; --gold:#e3b341;
+  --radius:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Segoe UI",sans-serif;
+  min-height:100%;overscroll-behavior:none}
+body{background:
+  radial-gradient(600px 400px at 0% 0%, rgba(163,113,247,.22), transparent 60%),
+  radial-gradient(600px 400px at 100% 30%, rgba(63,185,80,.14), transparent 60%),
+  radial-gradient(600px 500px at 50% 110%, rgba(88,166,255,.18), transparent 60%), var(--bg);
+  background-attachment:fixed}
+.app{max-width:480px;margin:0 auto;padding:20px 18px 40px;min-height:100vh}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-block-end:14px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;letter-spacing:.2px}
+.brand svg{width:26px;height:26px}
+.chip{font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:rgba(255,255,255,.03)}
+.steps{display:flex;gap:6px;margin-block-end:18px}
+.steps i{flex:1;height:4px;border-radius:4px;background:var(--line);transition:background .3s}
+.steps i.on{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.screen{display:none;animation:fade .35s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:30px;line-height:1.18;margin:6px 0 10px;font-weight:900;letter-spacing:-.5px}
+h2{font-size:22px;margin:4px 0 8px;font-weight:800}
+.grad{background:linear-gradient(90deg,var(--accent),var(--pink),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+p.lead{color:var(--muted);font-size:15px;line-height:1.55;margin:0 0 16px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-block-end:14px}
+.perks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}
+.perk{text-align:center;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 4px}
+.perk b{display:block;font-size:26px;line-height:1.2}
+.perk span{font-size:12px;color:var(--muted);font-weight:700}
+.free{display:inline-block;font-size:11px;font-weight:800;color:#0d1117;background:var(--accent2);padding:3px 8px;border-radius:6px;margin-block-end:6px}
+.only{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gold);font-weight:700;margin-block-start:10px}
+.info{display:grid;gap:8px;font-size:14px}
+.info div{display:flex;gap:10px;align-items:flex-start}
+.info em{font-style:normal;color:var(--muted);min-width:44px;font-size:12px;padding-block-start:2px}
+.prizes{display:grid;gap:8px}
+.prize{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700}
+.prize .ico{font-size:24px}
+.prize small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:17px 16px;font-size:17px;font-weight:800;color:#fff;cursor:pointer;
+  background:linear-gradient(90deg,#8957e5,#a371f7 45%,#db61a2);box-shadow:0 10px 30px -10px rgba(163,113,247,.7);transition:transform .1s,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.green{background:linear-gradient(90deg,#238636,#3fb950);box-shadow:0 10px 30px -10px rgba(63,185,80,.7)}
+.btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--fg);font-size:15px;padding:13px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px;color:var(--fg)}
+label .req{color:var(--pink)}
+input[type=text],input[type=email],input[type=tel],select{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg2);color:var(--fg);font-size:16px;outline:none;transition:border .2s}
+input:focus,select:focus{border-color:var(--accent)}
+input.bad{border-color:var(--warn)}
+input.ok{border-color:var(--accent2)}
+.hint{font-size:12px;margin-block-start:6px;min-height:16px;color:var(--muted)}
+.hint.err{color:var(--warn)}
+.hint.good{color:var(--accent2)}
+.hint.warn{color:#e3b341}
+.issued{display:inline-block;margin-block-start:6px;font-size:10.5px;font-weight:800;color:#0d1117;background:#e3b341;border-radius:6px;padding:2px 6px}
+.practice{display:inline-block;font-size:11px;font-weight:900;color:#0d1117;background:#e3b341;border-radius:6px;padding:3px 8px;margin-block-end:6px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.5;margin:14px 0}
+.consent input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.consent b{color:var(--fg)}
+/* ===== BUG ROYALE (FPS) ===== */
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.sevtag{display:inline-block;margin-block-start:8px;font-size:11px;font-weight:900;padding:4px 10px;border-radius:999px}
+.fixed{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:#56d364;background:#010409;border:1px solid rgba(63,185,80,.4);border-radius:10px;padding:10px 12px;margin:4px 0 14px;line-height:1.6}
+.mtitle{display:flex;justify-content:space-between;align-items:flex-end;margin-block-end:8px}
+.mtitle h2{margin:0;font-size:22px;letter-spacing:-.3px}
+.mtitle small{font-size:11px;color:#f2cc60;font-weight:800;letter-spacing:1px}
+.fps{position:relative;border-radius:16px;overflow:hidden;border:1px solid #3a3f2a;aspect-ratio:3/4;max-height:62vh;width:100%;
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(0,0,0,.0) 40%, rgba(0,0,0,.75) 100%),
+    linear-gradient(180deg,#5b6b7a 0%,#9aa3a0 34%,#c9b98d 35%,#8f8457 52%,#5e5a36 75%,#3c3a22 100%);
+  font-family:"Bahnschrift","Arial Narrow",-apple-system,"Apple SD Gothic Neo",sans-serif;user-select:none;touch-action:manipulation}
+.fps:before{content:"";position:absolute;inset:35% 0 0 0;
+  background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.08) 46px 48px),repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.07) 30px 32px);
+  transform:perspective(300px) rotateX(45deg);transform-origin:top}
+.fps .hills{position:absolute;inset:22% 0 auto 0;height:16%;background:
+  radial-gradient(ellipse 30% 100% at 15% 100%,#56653f 60%,transparent 61%),
+  radial-gradient(ellipse 40% 90% at 60% 100%,#4b5a38 60%,transparent 61%),
+  radial-gradient(ellipse 30% 110% at 95% 100%,#56653f 60%,transparent 61%)}
+.fps .zone{position:absolute;inset:-30%;border-radius:50%;box-shadow:inset 0 0 0 9999px rgba(0,90,255,.0);border:3px solid rgba(80,160,255,.55);transition:inset 1.7s linear}
+.fps.run .zone{inset:6%}
+.hudtop{position:absolute;inset:8px 8px auto 8px;display:flex;justify-content:space-between;align-items:flex-start;z-index:6;font-weight:800;color:#fff;text-shadow:0 1px 2px #000}
+.hudbox{background:rgba(0,0,0,.45);border-radius:6px;padding:4px 8px;font-size:12px;letter-spacing:.5px}
+.hudbox b{font-size:16px;color:#f2cc60;margin-inline-start:4px}
+.compass{position:absolute;inset:8px 25% auto 25%;height:22px;overflow:hidden;z-index:5;mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent)}
+.compass div{position:absolute;white-space:nowrap;font-size:11px;font-weight:800;color:#fff;letter-spacing:9px;transition:transform 1.7s cubic-bezier(.2,.7,.2,1);text-shadow:0 1px 2px #000}
+.compass:after{content:"";position:absolute;inset:auto 50% 0;width:2px;height:6px;background:#f2cc60}
+.timer3{position:absolute;inset:40px 0 auto 0;text-align:center;z-index:6;font-size:30px;font-weight:900;color:#fff;text-shadow:0 2px 6px #000;font-variant-numeric:tabular-nums;opacity:.0;transition:opacity .2s}
+.fps.run .timer3{opacity:1}
+.tgt{position:absolute;width:30%;transform:translate(-50%,-50%);text-align:center;z-index:3;transition:filter .2s,opacity .5s}
+.tgt .bug{font-size:44px;line-height:1;display:block;filter:drop-shadow(0 6px 4px rgba(0,0,0,.5));animation:strafe 1.6s ease-in-out infinite}
+.tgt:nth-child(2n) .bug{animation-duration:1.2s;animation-direction:reverse}
+@keyframes strafe{0%,100%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+.tgt .hp{width:56px;height:5px;margin:4px auto;background:rgba(0,0,0,.5);border-radius:3px;overflow:hidden}
+.tgt .hp i{display:block;height:100%;width:100%;background:#e5534b;transition:width .25s}
+.tgt .tg{display:inline-block;font-size:10px;font-weight:900;padding:2px 6px;border-radius:4px;margin-block-end:3px}
+.tgt .loot{display:block;font-size:10.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border-radius:4px;padding:2px 4px;line-height:1.3;text-shadow:none}
+.fps.run .tgt{filter:brightness(.7)}
+.fps.run .tgt.lock{filter:none}
+.tgt.dead .bug{animation:none;transform:rotate(90deg) translateY(10px);filter:grayscale(1) brightness(.6);transition:transform .35s}
+.tgt.dead .hp i{width:0}
+.tgt.other{opacity:.35}
+.reticle{position:absolute;width:96px;height:96px;margin:-48px 0 0 -48px;z-index:5;pointer-events:none;left:50%;top:50%;transition:left .12s ease-out,top .12s ease-out}
+.reticle:before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,255,255,.85);box-shadow:0 0 0 2000px rgba(0,0,0,.0),inset 0 0 12px rgba(0,0,0,.4)}
+.reticle i{position:absolute;background:#ff3b30}
+.reticle i:nth-child(1){left:47px;top:6px;width:2px;height:28px}
+.reticle i:nth-child(2){left:47px;bottom:6px;width:2px;height:28px}
+.reticle i:nth-child(3){top:47px;left:6px;height:2px;width:28px}
+.reticle i:nth-child(4){top:47px;right:6px;height:2px;width:28px}
+.reticle b{position:absolute;left:45px;top:45px;width:6px;height:6px;border-radius:50%;background:#ff3b30;box-shadow:0 0 8px #ff3b30}
+.fps.scope .reticle:before{box-shadow:0 0 0 2000px rgba(0,0,0,.55),inset 0 0 12px rgba(0,0,0,.4)}
+.reticle.locked:before{border-color:#ff3b30;animation:lockp .25s 3}
+@keyframes lockp{50%{transform:scale(.85)}}
+.hitmark{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;z-index:7;pointer-events:none;opacity:0}
+.hitmark:before,.hitmark:after{content:"";position:absolute;left:19px;top:0;width:3px;height:40px;background:#fff;box-shadow:0 0 4px #000}
+.hitmark:before{transform:rotate(45deg)}.hitmark:after{transform:rotate(-45deg)}
+.hitmark.on{animation:hm .5s}
+@keyframes hm{0%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(1)}}
+.dmg{position:absolute;z-index:7;font-weight:900;color:#f2cc60;font-size:22px;text-shadow:0 2px 4px #000;pointer-events:none;animation:dmg .9s forwards}
+@keyframes dmg{to{transform:translateY(-40px);opacity:0}}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:8;pointer-events:none}
+.flash.on{animation:fl .18s}
+@keyframes fl{0%{opacity:.85}100%{opacity:0}}
+.fps.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,2px)}75%{transform:translate(2px,3px)}}
+.killfeed{position:absolute;inset:38px 8px auto auto;z-index:6;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.killfeed div{background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:700;padding:3px 7px;border-radius:4px;animation:fade .2s}
+.killfeed .hs{color:#f2cc60}
+.hudbot{position:absolute;inset:auto 8px 8px 8px;display:flex;justify-content:space-between;align-items:flex-end;z-index:6;color:#fff;text-shadow:0 1px 2px #000}
+.hpbar{width:46%}
+.hpbar small{font-size:10px;font-weight:800;opacity:.9}
+.hpbar div{height:7px;background:rgba(0,0,0,.5);border-radius:2px;overflow:hidden;margin-block-start:3px}
+.hpbar div i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#fff,#d9d9d9)}
+.weapon{text-align:end;font-weight:900}
+.weapon small{display:block;font-size:10px;opacity:.85;letter-spacing:1px}
+.weapon b{font-size:22px}.weapon span{font-size:13px;opacity:.8}
+.win{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle,rgba(0,0,0,.55),rgba(0,0,0,.85));opacity:0;pointer-events:none;transition:opacity .3s}
+.win.on{opacity:1}
+.win .w1{font-size:30px;font-weight:900;color:#f2cc60;letter-spacing:1px;text-shadow:0 3px 10px #000;line-height:1.15}
+.win .w2{font-size:13px;color:#fff;font-weight:700;margin-block-start:8px}
+.win .w3{margin-block-start:12px;font-size:15px;font-weight:900;color:#fff;background:rgba(242,204,96,.18);border:1px solid #f2cc60;border-radius:8px;padding:8px 14px}
+.firebtn{display:flex;align-items:center;justify-content:center;gap:10px;margin-block-start:12px;background:linear-gradient(180deg,#e0a526,#b7791f);color:#1b1300;box-shadow:0 10px 30px -10px rgba(224,165,38,.8);font-family:"Bahnschrift","Arial Narrow",-apple-system,sans-serif;letter-spacing:.5px}
+.firebtn .dot{width:22px;height:22px;border-radius:50%;border:3px solid #1b1300;position:relative}
+.firebtn .dot:after{content:"";position:absolute;inset:6px;border-radius:50%;background:#1b1300}
+.brief{display:flex;gap:6px;justify-content:center;margin:0 0 10px;flex-wrap:wrap}
+.brief span{font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;border:1px solid}
+.brief .p0{color:#ff7b72;border-color:rgba(248,81,73,.5);background:rgba(248,81,73,.1)}
+.brief .p1{color:#e3b341;border-color:rgba(227,179,65,.5);background:rgba(227,179,65,.1)}
+.brief .p2{color:#79c0ff;border-color:rgba(88,166,255,.5);background:rgba(88,166,255,.1)}
+/* coupon */
+.coupon{position:relative;border-radius:var(--radius);overflow:hidden;background:linear-gradient(135deg,#2d1b4e,#1b2a3f 60%,#123222);border:1px solid rgba(163,113,247,.5);padding:22px 18px;text-align:center}
+.coupon:before,.coupon:after{content:"";position:absolute;inset-block-start:58%;width:26px;height:26px;border-radius:50%;background:var(--bg)}
+.coupon:before{inset-inline-start:-13px}.coupon:after{inset-inline-end:-13px}
+.coupon .lbl{font-size:12px;letter-spacing:2px;color:var(--muted);font-weight:800}
+.coupon .item{font-size:24px;font-weight:900;margin:8px 0 2px}
+.coupon .sub{font-size:13px;color:var(--gold);font-weight:700}
+.coupon .dash{border-block-start:2px dashed rgba(255,255,255,.18);margin:18px 0 14px}
+.coupon .code{position:static;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:24px;font-weight:900;letter-spacing:2px;color:#fff;white-space:normal;padding:0}
+.coupon .who{font-size:12px;color:var(--muted);margin-block-start:8px}
+.status{display:flex;gap:10px;align-items:center;font-size:13.5px;padding:12px 14px;border-radius:12px;margin:14px 0;border:1px solid var(--line);background:var(--bg2);line-height:1.45}
+.status.ok{border-color:rgba(63,185,80,.5);color:#aff5b4}
+.status.err{border-color:rgba(248,81,73,.5);color:#ffa198}
+.drinks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.drink{background:var(--bg2);border:2px solid var(--line);border-radius:14px;padding:12px 4px;text-align:center;font-weight:800;font-size:13px;color:var(--fg);cursor:pointer}
+.drink b{display:block;font-size:28px}
+.drink.sel{border-color:var(--accent2);background:rgba(63,185,80,.12)}
+.foot{text-align:center;color:#6e7681;font-size:11px;margin-block-start:22px;line-height:1.6}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.modal.show{display:flex}
+.modal .card{max-width:420px;width:100%;background:var(--bg2)}
+
+/* ===== tactical survival theme ===== */
+:root{--bg:#121310;--bg2:#1b1c16;--card:#202118;--line:#3d3b2b;--fg:#f1ead8;--muted:#a59e86;
+  --accent:#f2a900;--accent2:#86a83c;--pink:#ff7a3d;--blue:#6fb6ff;--warn:#ff5a4a;--gold:#f2a900;--radius:6px}
+body{background:
+  radial-gradient(700px 420px at 0% 0%, rgba(242,169,0,.16), transparent 60%),
+  radial-gradient(600px 420px at 100% 40%, rgba(134,168,60,.14), transparent 60%),
+  repeating-radial-gradient(circle at 80% 15%, transparent 0 38px, rgba(242,169,0,.035) 38px 39px),
+  repeating-linear-gradient(0deg, transparent 0 59px, rgba(255,255,255,.025) 59px 60px),
+  repeating-linear-gradient(90deg, transparent 0 59px, rgba(255,255,255,.025) 59px 60px), var(--bg);
+  background-attachment:fixed}
+h1,h2,.mtitle h2,.btn,.chip,.free,.coupon .lbl,.coupon .item,.win .w1,.hudbox,.weapon{font-family:"Bahnschrift","DIN Condensed","Arial Narrow","Roboto Condensed",-apple-system,"Apple SD Gothic Neo",sans-serif}
+h1{letter-spacing:-.3px;text-transform:uppercase}
+h2{text-transform:uppercase;letter-spacing:.3px}
+.grad{background:linear-gradient(90deg,#ffd257,#f2a900 50%,#ff7a3d)}
+.chip{color:#f2a900;border-color:rgba(242,169,0,.55);background:rgba(242,169,0,.08);border-radius:3px;letter-spacing:1px}
+.free{background:#f2a900;color:#111;border-radius:2px;letter-spacing:.5px}
+.steps i{border-radius:0;height:5px;transform:skewX(-20deg)}
+.steps i.on{background:#f2a900}
+.card{background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.2));border:1px solid rgba(242,169,0,.18);border-inline-start:3px solid #f2a900;border-radius:4px}
+.perk,.prize,.drink{border-radius:4px;background:rgba(0,0,0,.35)}
+.prize{border-inline-start:3px solid var(--line)}
+input[type=text],input[type=email],input[type=tel],select{border-radius:4px;background:rgba(0,0,0,.4)}
+input:focus,select:focus{border-color:#f2a900}
+.btn{border-radius:3px;background:#f2a900;color:#111;text-transform:uppercase;letter-spacing:.6px;font-weight:900;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);box-shadow:none}
+.btn:not(:disabled):hover{filter:brightness(1.08)}
+.btn.green{background:#6b8a2c;color:#fff;box-shadow:none}
+.btn.ghost{clip-path:none;color:var(--fg)}
+.firebtn{font-size:22px;padding:18px 16px;letter-spacing:1px;background:linear-gradient(180deg,#ffbf1f,#e09a00);color:#111}
+.firebtn .dot{border-color:#111}.firebtn .dot:after{background:#111}
+.fps{border:2px solid #f2a900;border-radius:4px}
+.fixed{border-radius:4px}
+.coupon{border-radius:6px;background:
+  repeating-linear-gradient(135deg,rgba(0,0,0,.08) 0 10px,transparent 10px 20px),
+  linear-gradient(135deg,#3b3a22,#26271a 55%,#1b1d14);border:2px solid #f2a900}
+.coupon .lbl{color:#f2a900;letter-spacing:3px}
+.coupon .code{color:#ffd257}
+.status{border-radius:4px}
+/* plane flyover + airdrop */
+.route{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:linear-gradient(160deg,transparent calc(50% - 1px),rgba(255,255,255,.55) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px));
+  -webkit-mask-image:repeating-linear-gradient(70deg,#000 0 8px,transparent 8px 14px);mask-image:repeating-linear-gradient(70deg,#000 0 8px,transparent 8px 14px)}
+.fps.run .route{opacity:.8}
+.plane{position:absolute;z-index:4;font-size:30px;left:-14%;top:4%;transform:rotate(20deg);pointer-events:none;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5))}
+.fps.run .plane{animation:fly 1.7s linear forwards}
+@keyframes fly{to{left:108%;top:62%}}
+.crate{position:absolute;z-index:6;width:60px;margin-inline-start:-30px;text-align:center;pointer-events:none;opacity:0;top:-20%}
+.crate span{display:block;font-size:22px;line-height:1}
+.crate b{display:block;font-size:30px;line-height:1;filter:drop-shadow(0 0 8px rgba(255,60,40,.9))}
+.crate.drop{animation:drop .6s ease-out forwards}
+@keyframes drop{0%{opacity:1;top:-20%}100%{opacity:1;top:var(--cy)}}
+.rank{font-size:13px;font-weight:900;color:#111;background:#f2a900;padding:3px 10px;border-radius:2px;margin-block-end:8px;letter-spacing:1px}
+.win .w1{color:#f2a900}
+.win .w3{border-color:#f2a900;background:rgba(242,169,0,.15);border-radius:3px}
+
+/* ===== alert targets (range board + error toast) ===== */
+.tgt{width:31%}
+.tgt .toast{display:block;text-align:start;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(12,13,10,.88);
+  border:1px solid rgba(255,255,255,.12);border-inline-start:3px solid var(--sc);border-radius:3px;padding:3px 5px;margin:0 auto 5px;max-width:112px;
+  box-shadow:0 4px 10px rgba(0,0,0,.45);color:#f1ead8;line-height:1.25;transition:transform .2s}
+.tgt .toast b{display:block;font-size:9.5px;letter-spacing:.6px;color:var(--sc)}
+.tgt .toast span{display:block;font-size:10.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tgt .toast small{display:block;font-size:8.5px;opacity:.6;white-space:nowrap}
+.tgt .toast .fx{display:none;color:#7ee07e}
+.tgt .board{position:relative;width:58px;height:58px;margin:0 auto;border-radius:50%;
+  background:radial-gradient(circle,var(--sc) 0 7px,#f3ecd9 7px 13px,var(--sc) 13px 19px,#f3ecd9 19px 24px,#2a2a22 24px 27px,#f3ecd9 27px 29px);
+  box-shadow:0 0 0 2px #1b1b14,0 8px 10px -2px rgba(0,0,0,.6);transform-origin:50% 100%;transition:transform .35s cubic-bezier(.5,-0.4,.7,1.4),filter .3s;
+  animation:sway 1.8s ease-in-out infinite}
+.tgt:nth-child(2n) .board{animation-duration:1.4s;animation-direction:reverse}
+@keyframes sway{0%,100%{transform:translateX(-4px)}50%{transform:translateX(4px)}}
+.tgt .board:before,.tgt .board:after{content:"";position:absolute;background:rgba(0,0,0,.35)}
+.tgt .board:before{left:50%;top:2px;bottom:2px;width:1px}
+.tgt .board:after{top:50%;left:2px;right:2px;height:1px}
+.tgt .board em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:9px;font-weight:900;color:#fff;z-index:1;text-shadow:0 0 2px #000}
+.tgt .stand{width:34px;height:12px;margin:-2px auto 0;background:
+  linear-gradient(60deg,transparent 45%,#4a4532 45% 55%,transparent 55%) left/50% 100% no-repeat,
+  linear-gradient(-60deg,transparent 45%,#4a4532 45% 55%,transparent 55%) right/50% 100% no-repeat}
+.tgt.lock .board{animation:none;box-shadow:0 0 0 2px #ff3b30,0 0 18px 4px rgba(255,59,48,.75)}
+.tgt.lock .toast{transform:scale(1.08)}
+.tgt.dead .board{animation:none;transform:perspective(160px) rotateX(78deg);filter:grayscale(.6) brightness(.7)}
+.tgt.dead .toast{border-inline-start-color:#3fb950}
+.tgt.dead .toast b,.tgt.dead .toast small{text-decoration:line-through;opacity:.5}
+.tgt.dead .toast .fx{display:block}
+.prize .ico{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;font-weight:900;padding:4px 6px;border-radius:3px;min-width:46px;text-align:center;color:#fff}
+
+/* ===== MAIN GAME only: PiC MAN pixel arcade ===== */
+#s-wheel .mtitle h2,#s-wheel .lead,#s-wheel .brief span,#s-wheel .firebtn{font-family:"DungGeunMo","Galmuri11","NeoDunggeunmo",ui-monospace,SFMono-Regular,Menlo,Consolas,"Apple SD Gothic Neo",monospace}
+#s-wheel .mtitle h2{text-transform:none;text-shadow:2px 2px 0 #2121de}
+#s-wheel .mtitle small{color:#00e5ff}
+#s-wheel .brief span{border-radius:0}
+.arcade{position:relative;background:#000;border:4px double #2121de;overflow:hidden;user-select:none;touch-action:manipulation;box-shadow:0 0 0 2px #000}
+.arcade.shake{animation:shake .3s}
+#pix{display:block;width:100%;height:auto;image-rendering:crisp-edges;image-rendering:pixelated}
+.tagp{position:absolute;transform:translate(-50%,-50%);z-index:3;pointer-events:none;white-space:nowrap;font:700 10px/1.3 ui-monospace,Menlo,Consolas,monospace;
+  color:#fff;background:#000;border:1px solid var(--sc);padding:1px 4px;transition:transform .08s}
+.tagp b{color:var(--sc)}
+.tagp .fx{display:none;color:#39ff14}
+.tagp.lock{background:var(--sc);color:#000;transform:translate(-50%,-50%) scale(1.18)}
+.tagp.lock b{color:#000}
+.tagp.dead{border-color:#39ff14}
+.tagp.dead .fx{display:inline}
+.term{font:700 12px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#39ff14;background:#000;border:2px solid #2121de;padding:8px 10px;margin-block-start:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#s-wheel .firebtn{border-radius:0;clip-path:none;background:#ffd400;color:#000;font-size:21px;box-shadow:0 5px 0 #a07800;transition:transform .05s}
+#s-wheel .firebtn:active{transform:translateY(3px);box-shadow:0 2px 0 #a07800}
+#s-wheel .firebtn .dot{width:20px;height:20px;border:0;border-radius:50%;background:#000;clip-path:polygon(100% 22%,50% 50%,100% 78%,100% 100%,0 100%,0 0,100% 0)}
+#s-wheel .firebtn .dot:after{display:none}
+.arcade .win{background:rgba(0,0,0,.82);font-family:ui-monospace,Menlo,Consolas,monospace}
+.arcade .win .rank{background:#00e5ff;color:#000;border-radius:0;font-family:inherit}
+.arcade .win .w1{color:#ffd400;text-shadow:3px 3px 0 #ff2a6d;font-family:inherit;letter-spacing:1px}
+.arcade .win .w2,.arcade .win .w3{font-family:inherit}
+.arcade .win .w3{border:2px solid #ffd400;background:#000;border-radius:0}
+</style>
+</head>
+<body>
+<canvas class="confetti" id="confetti"></canvas>
+<main class="app">
+  <div class="top">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#e6edf3" d="M12 1.5C6.2 1.5 1.5 6.2 1.5 12c0 4.6 3 8.6 7.2 10 .5.1.7-.2.7-.5v-1.8c-2.9.6-3.5-1.4-3.5-1.4-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1 .1 1.6 1.1 1.6 1.1.9 1.6 2.5 1.2 3.1.9.1-.7.4-1.2.7-1.4-2.3-.3-4.8-1.2-4.8-5.2 0-1.1.4-2.1 1.1-2.8-.1-.3-.5-1.4.1-2.8 0 0 .9-.3 2.9 1.1.8-.2 1.7-.3 2.6-.3s1.8.1 2.6.3c2-1.4 2.9-1.1 2.9-1.1.6 1.5.2 2.5.1 2.8.7.8 1.1 1.7 1.1 2.8 0 4-2.5 4.9-4.8 5.2.4.3.7 1 .7 2v2.9c0 .3.2.6.7.5 4.2-1.4 7.2-5.4 7.2-10C22.5 6.2 17.8 1.5 12 1.5z"/></svg>
+      GitHub Copilot <span style="color:var(--muted);font-weight:600">× G-STAR</span>
+    </div>
+    <span class="chip">SQUAD UP · DEV NIGHT</span>
+  </div>
+  <div class="steps" aria-hidden="true"><i class="on" data-s="0"></i><i data-s="1"></i><i data-s="2"></i><i data-s="3"></i></div>
+
+  <!-- 0. HERO -->
+  <section class="screen active" id="s-hero">
+    <span class="free">FREE · 기업 인증 개발자 전용</span>
+    <h1>게임 만들다 지친 개발자,<br><span class="grad">오늘 밤은 Copilot이 쏩니다</span> 🌮🍺</h1>
+    <p class="lead">11/19(목)·11/20(금) 17시, G-STAR 끝나고 해운대 GitHub Copilot 팝업 네트워킹으로 오세요. PiC MAN 버그 먹기 룰렛 👾 1.7초 동안 미로를 달린 PiC MAN이 버그를 먹으면, 버그 등급만큼 보급품(안주)이 떨어집니다 🪂</p>
+    <div class="card">
+      <div style="font-weight:800;font-size:14px">입장하면 모두 무료</div>
+      <div class="perks">
+        <div class="perk"><b>🍺</b><span>맥주</span></div>
+        <div class="perk"><b>🌮</b><span>기본 타코</span></div>
+        <div class="perk"><b>🫓</b><span>퀘사디아</span></div>
+      </div>
+      <div class="only">🔒 기업 이메일 인증 방문객 only</div>
+    </div>
+    <div class="card">
+      <div style="font-weight:800;font-size:14px;margin-block-end:10px">🪂 BUG ROYALE — 잡은 버그 등급별 보급품</div>
+      <div class="prizes" id="prizeList"></div>
+    </div>
+    <div class="card info" id="eventInfo"></div>
+    <button class="btn" id="goForm" type="button">참여하고 쿠폰 받기 →</button>
+    <div class="foot">참여 순서: 정보 입력 → 👾 PiC MAN 1.7초 버그 먹기 룰렛 → 이메일로 쿠폰 발송</div>
+  </section>
+
+  <!-- 1. FORM -->
+  <section class="screen" id="s-form">
+    <h2>개발자 인증 🔐</h2>
+    <p class="lead">쿠폰과 행사장 안내는 <b style="color:var(--fg)">회사 이메일</b>로 보내드립니다. 개인 메일(Gmail, Naver, Daum 등)은 사용할 수 없어요.</p>
+    <form id="regForm" novalidate>
+      <label for="fName">이름 <span class="req">*</span></label>
+      <input type="text" id="fName" autocomplete="name" placeholder="홍길동" maxlength="30">
+      <div class="hint" id="hName"></div>
+
+      <label for="fCompany">회사명 <span class="req">*</span></label>
+      <input type="text" id="fCompany" autocomplete="organization" placeholder="예) ○○게임즈" maxlength="50">
+      <div class="hint" id="hCompany"></div>
+
+      <label for="fRole">직무 <span class="req">*</span></label>
+      <select id="fRole">
+        <option value="">선택해 주세요</option>
+        <option>클라이언트 개발</option><option>서버/백엔드 개발</option><option>엔진/툴 개발</option>
+        <option>DevOps/인프라</option><option>QA/테스트 자동화</option><option>AI/데이터</option>
+        <option>테크 리드/CTO</option><option>기타</option>
+      </select>
+      <div class="hint" id="hRole"></div>
+
+      <label for="fEmail">회사 이메일 <span class="req">*</span></label>
+      <input type="email" id="fEmail" autocomplete="email" inputmode="email" placeholder="name@company.com" maxlength="80">
+      <div class="hint" id="hEmail">네이버·다음·지메일 등 개인 메일은 사용할 수 없습니다.</div>
+
+      <label for="fPhone">휴대폰 번호 <span style="color:var(--muted);font-weight:500">(선택)</span></label>
+      <input type="tel" id="fPhone" autocomplete="tel" inputmode="numeric" placeholder="010-1234-5678" maxlength="13">
+      <div class="hint" id="hPhone"></div>
+
+      <label>방문 예정일 <span class="req">*</span></label>
+      <div class="drinks" id="sessPick" style="grid-template-columns:1fr 1fr;margin:0"></div>
+      <div class="hint" id="hSess"></div>
+
+      <div class="consent">
+        <input type="checkbox" id="fAgree">
+        <label for="fAgree" style="margin:0;font-weight:500;color:var(--muted)"><b>[필수] 개인정보 수집·이용 동의</b><br>수집 항목: 이름, 회사명, 직무, 회사 이메일, 휴대폰 번호 · 목적: 쿠폰 발송 및 방문객 확인 · 보유 기간: 행사 종료 후 1년 이내 파기</label>
+      </div>
+      <div class="consent">
+        <input type="checkbox" id="fMkt">
+        <label for="fMkt" style="margin:0;font-weight:500;color:var(--muted)">[선택] GitHub Copilot 관련 행사·소식 안내 수신 동의</label>
+      </div>
+      <button class="btn" id="submitBtn" type="button" disabled>인증 완료하고 전장에 드랍 🪂</button>
+    </form>
+  </section>
+
+  <!-- 2. PiC MAN (PIXEL BUG-CHOMP ROULETTE) -->
+  <section class="screen" id="s-wheel">
+    <div class="mtitle"><h2>👾 PiC MAN</h2><small>BUG CHOMP · 1 PLAYER</small></div>
+    <p class="lead" style="margin-block-end:8px">버그 알림 5개가 미로에 떴습니다. <b style="color:var(--gold)">BUG 잡기 GO</b>를 누르면 Copilot 고글을 쓴 PiC MAN이 1.7초 동안 미로를 질주하다 멈춘 자리의 버그를 냠! 먹은 버그 등급의 메뉴가 당신 것!</p>
+    <div class="brief"><span class="p0">P0 = 하몽&amp;멜론 플래터</span><span class="p1">P1 = 소세지&amp;감자튀김</span><span class="p2">P2 = 드링크</span></div>
+    <div class="arcade" id="arcade">
+      <canvas id="pix" width="160" height="200" role="img" aria-label="PiC MAN 버그 먹기 룰렛 화면"></canvas>
+      <div id="tags"></div>
+      <div class="win" id="win"><div class="rank">STAGE CLEAR</div><div class="w1">WINNER WINNER<br>TACO DINNER!</div><div class="w2" id="winSub"></div><div class="w3" id="winLoot"></div></div>
+    </div>
+    <div class="term" id="term">&gt; READY PLAYER 1_</div>
+    <button class="btn firebtn" id="spinBtn" type="button"><span class="dot"></span>BUG 잡기 GO</button>
+  </section>
+
+  <!-- 4. RESULT -->
+  <section class="screen" id="s-result">
+    <div id="practiceTag" class="practice" style="display:none">PRACTICE ROUND · 연습 경기</div>
+    <h2 id="resTitle">🎉 버그 해결!</h2>
+    <div class="fixed" id="fixedLine"></div>
+    <div id="drinkPick" style="display:none">
+      <p class="lead" style="margin-block-end:0">드링크를 1개 선택하면 쿠폰이 발행됩니다.</p>
+      <div class="drinks">
+        <button type="button" class="drink" data-d="칵테일"><b>🍸</b>칵테일</button>
+        <button type="button" class="drink" data-d="하이볼"><b>🥃</b>하이볼</button>
+        <button type="button" class="drink" data-d="수제맥주"><b>🍺</b>수제맥주</button>
+      </div>
+      <button class="btn green" id="drinkConfirm" type="button" disabled>이걸로 할게요</button>
+    </div>
+    <div id="couponArea" style="display:none">
+      <div class="coupon">
+        <div class="lbl">🪂 BUG ROYALE · AIRDROP COUPON</div>
+        <div class="sevtag" id="cSev"></div>
+        <div class="item" id="cItem"></div>
+        <div class="sub" id="cSub"></div>
+        <div class="dash"></div>
+        <div class="code" id="cCode"></div>
+        <div class="who" id="cWho"></div>
+      </div>
+      <div class="status" id="mailStatus">📨 쿠폰 메일을 보내는 중…</div>
+      <div class="card info" id="eventInfo2"></div>
+      <p class="lead" style="font-size:13px">현장 스태프에게 이 화면 또는 메일을 보여주시면 됩니다. 맥주·기본 타코·퀘사디아는 기업 인증 방문객 모두에게 무료로 제공됩니다.</p>
+      <button class="btn ghost" id="resendBtn" type="button">메일 다시 보내기</button>
+    </div>
+    <button class="btn ghost" id="replayBtn" type="button" style="margin-block-start:10px;display:none">🔁 한 판 더 (연습 경기 · 기존 쿠폰 재발송)</button>
+  </section>
+
+  <div class="foot">© GitHub Copilot Developer Night @ G-STAR · 본 이벤트는 기업 인증 방문객 대상입니다.</div>
+</main>
+
+<div class="modal" id="modal"><div class="card"><div id="modalMsg" style="font-size:15px;line-height:1.6"></div><button class="btn" id="modalClose" type="button" style="margin-block-start:14px">확인</button></div></div>
+
+<script>
+/* =====================================================================
+   ⚙️ 운영 설정 — 행사 전 이 블록만 수정하세요
+   ===================================================================== */
+const CONFIG = {
+  EVENT_NAME: "GitHub Copilot Developer Night @ G-STAR",
+  /* 행사 세션 (방문객이 방문일을 선택) */
+  SESSIONS: [
+    { id:"d19", label:"11/19(목)", time:"2026년 11월 19일(목) 17:00–22:00", venue:"올데이라운지",
+      address:"부산 해운대구 센텀2로 25, 106호" },
+    { id:"d20", label:"11/20(금)", time:"2026년 11월 20일(금) 17:00–22:00", venue:"리리코이",
+      address:"부산 해운대구 해운대해변로298번길 24, 1층 1-19호" }
+  ],
+  FREE_ITEMS: "맥주 · 기본 타코 · 퀘사디아 무료 (기업 인증 방문객 only)",
+  COUPON_VALID: "행사 당일 1회 사용 · 현장 스태프 확인 후 제공",
+
+  /* 메일 발송 엔드포인트 (HTTP POST, JSON)
+     - Power Automate "HTTP 요청을 받은 경우" 트리거 → Office 365 Outlook "메일 보내기(V2)"
+       (받는 사람=email, 제목=subject, 본문=html) 로 연결하면 바로 발송됩니다.
+     - 비워 두면 데모 모드: 쿠폰은 화면에만 표시되고 메일은 발송되지 않습니다. */
+  MAIL_ENDPOINT: "https://d76d84638a80eb87bb706754d53035.8b.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/03/workflows/c8f591875d3e4b9e879d00caba6713fc/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=PSI_YeKcMhAzJhEvcBjFet3nBr_sjdCO07vyICm4quA",
+
+  /* 룰렛 상품 & 당첨 확률(가중치) */
+  PRIZES: [
+    { key:"jamon",   sev:"P0", sevName:"Critical", bug:"MemoryLeak",     bugIcon:"⛔", alert:"FATAL", loc:"heap.cpp:4096", name:"하몽&멜론 치즈플래터",  sub:"33,000원 상당", icon:"🧀", color:"#b62324", weight:8  },
+    { key:"drink",   sev:"P2", sevName:"Minor",    bug:"Typo",           bugIcon:"⚠️", alert:"WARN",  loc:"ui/lobby.ts:12", name:"드링크 1잔",            sub:"칵테일 · 하이볼 · 수제맥주 택1", icon:"🍹", color:"#1f6feb", weight:31 },
+    { key:"sausage", sev:"P1", sevName:"Major",    bug:"RaceCondition",  bugIcon:"❗", alert:"ERROR", loc:"net/sync.go:88", name:"소세지플래터&감자튀김", sub:"쉐어 플래터", icon:"🌭", color:"#9e6a03", weight:22 },
+    { key:"drink",   sev:"P2", sevName:"Minor",    bug:"OffByOne",       bugIcon:"⚠️", alert:"WARN",  loc:"loot.cs:[i+1]", name:"드링크 1잔",            sub:"칵테일 · 하이볼 · 수제맥주 택1", icon:"🍺", color:"#0f5fa8", weight:31 },
+    { key:"sausage", sev:"P1", sevName:"Major",    bug:"NullReference",  bugIcon:"❗", alert:"ERROR", loc:"player.js:null", name:"소세지플래터&감자튀김", sub:"쉐어 플래터", icon:"🍟", color:"#8957e5", weight:8  }
+  ],
+
+  /* 거절할 개인 메일 도메인 */
+  BLOCKED_DOMAINS: ["gmail.com","googlemail.com","naver.com","daum.net","hanmail.net","kakao.com","nate.com","empas.com",
+    "hotmail.com","outlook.com","outlook.kr","live.com","live.co.kr","msn.com","yahoo.com","yahoo.co.kr","icloud.com","me.com","mac.com",
+    "proton.me","protonmail.com","aol.com","gmx.com","mail.com","zoho.com","yandex.com","qq.com","163.com","126.com",
+    "korea.com","chol.com","dreamwiz.com","hitel.net","lycos.co.kr","paran.com","freechal.com","netian.com","naver.co.kr"],
+  /* 쿠폰 발급 한도: 이메일 1개당 행사일(11/19, 11/20)별 1장. 게임은 몇 번이든 다시 할 수 있음 */
+  ONE_COUPON_PER_DAY: true
+};
+/* ===================================================================== */
+
+const $ = s => document.querySelector(s);
+const state = { user:null, prize:null, drink:null, rec:null, isDup:false };
+
+/* ---------- render shared info ---------- */
+function sevStyle(sv){ return sv==="P0" ? "color:#ff7b72;background:rgba(248,81,73,.15)" : sv==="P1" ? "color:#e3b341;background:rgba(227,179,65,.15)" : "color:#79c0ff;background:rgba(88,166,255,.15)"; }
+function mapURL(x){ return "https://map.naver.com/p/search/" + encodeURIComponent(x.address); }
+function getSession(id){ return CONFIG.SESSIONS.find(x => x.id === id); }
+function infoHTML(only){
+  const list = only ? [only] : CONFIG.SESSIONS;
+  return list.map(x => `<div><em>${x.label}</em><span><b>${x.venue}</b> · 17:00–22:00<br>${x.address}
+     <a href="${mapURL(x)}" target="_blank" rel="noopener" style="color:var(--blue);white-space:nowrap">지도 보기</a></span></div>`).join("")
+     + `<div><em>혜택</em><span>${CONFIG.FREE_ITEMS}</span></div>`;
+}
+$("#eventInfo").innerHTML = infoHTML();
+(() => {
+  const seen = new Set(); let html = "";
+  [...CONFIG.PRIZES].sort((a,b) => a.sev.localeCompare(b.sev)).forEach(p => { if (seen.has(p.key)) return; seen.add(p.key);
+    html += `<div class="prize"><span class="ico" style="background:${p.color}">${p.bugIcon} ${p.alert}</span><div><span class="sevtag" style="margin:0 6px 0 0;padding:2px 7px;${sevStyle(p.sev)}">${p.sev} ${p.sevName}</span>${p.icon} ${p.name}<small>${p.sub}</small></div></div>`; });
+  $("#prizeList").innerHTML = html;
+})();
+
+function go(id, step){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll(".steps i").forEach((el,i) => el.classList.toggle("on", i <= step));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function modal(msg){ $("#modalMsg").innerHTML = msg; $("#modal").classList.add("show"); }
+$("#modalClose").addEventListener("click", () => $("#modal").classList.remove("show"));
+$("#goForm").addEventListener("click", () => go("#s-form",1));
+
+/* ---------- daily coupon ledger (email × event day) ---------- */
+function ledgerKey(email, sid){ return `gc_coupon_${sid}_${email}`; }
+function getIssued(email, sid){
+  if (!CONFIG.ONE_COUPON_PER_DAY || !email || !sid) return null;
+  try { return JSON.parse(localStorage.getItem(ledgerKey(email, sid)) || "null"); } catch(e){ return null; }
+}
+function saveIssued(rec){ try { localStorage.setItem(ledgerKey(rec.email, rec.sid), JSON.stringify(rec)); } catch(e){} }
+function refreshDayBadges(){
+  const em = $("#fEmail").value.replace(/\s/g,"").toLowerCase();
+  document.querySelectorAll("#sessPick .drink").forEach(b => {
+    const has = getIssued(em, b.dataset.sid);
+    let tag = b.querySelector(".issued");
+    if (has && !tag){ tag = document.createElement("span"); tag.className = "issued"; tag.textContent = "쿠폰 발급 완료"; b.appendChild(tag); }
+    if (!has && tag) tag.remove();
+  });
+  const cur = getIssued(em, selSession), h = $("#hSess");
+  if (cur){ h.className = "hint warn"; h.textContent = `📌 ${getSession(selSession).label} 쿠폰은 이미 발급되었습니다 (${cur.code}). 다시 플레이하면 이미 당첨되신 쿠폰을 메일로 재발송해드려요.`; }
+}
+
+/* ---------- session picker ---------- */
+let selSession = null;
+$("#sessPick").innerHTML = CONFIG.SESSIONS.map(x =>
+  `<button type="button" class="drink" data-sid="${x.id}"><b style="font-size:17px">${x.label}</b>${x.venue}<br><span style="font-weight:500;color:var(--muted);font-size:11.5px">17:00–22:00</span></button>`).join("");
+document.querySelectorAll("#sessPick .drink").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#sessPick .drink").forEach(x => x.classList.remove("sel"));
+  b.classList.add("sel"); selSession = b.dataset.sid; validate();
+}));
+
+/* ---------- form validation ---------- */
+const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function checkEmail(v){
+  v = v.replace(/\s/g,"").toLowerCase();
+  if (!v) return {ok:false,msg:"회사 이메일을 입력해 주세요."};
+  if (!emailRe.test(v)) return {ok:false,msg:"이메일 형식이 올바르지 않습니다."};
+  const domain = v.split("@")[1];
+  const blocked = CONFIG.BLOCKED_DOMAINS.some(d => domain === d || domain.endsWith("." + d));
+  if (blocked) return {ok:false,msg:`🚫 ${domain} 은(는) 개인 메일입니다. 회사 도메인 이메일을 입력해 주세요.`};
+  return {ok:true,msg:""};
+}
+function fmtPhone(v){
+  const d = v.replace(/\D/g,"").slice(0,11);
+  if (d.length < 4) return d;
+  if (d.length < 8) return d.slice(0,3)+"-"+d.slice(3);
+  return d.slice(0,3)+"-"+d.slice(3,d.length-4)+"-"+d.slice(-4);
+}
+function setHint(inputId, hintId, res){
+  const i = $(inputId), h = $(hintId);
+  i.classList.toggle("bad", !res.ok && res.show); i.classList.toggle("ok", res.ok);
+  h.textContent = res.show || res.ok ? res.msg : h.dataset.def || "";
+  h.className = "hint" + (res.ok ? " good" : (res.show ? " err" : ""));
+}
+$("#hEmail").dataset.def = "네이버·다음·지메일 등 개인 메일은 사용할 수 없습니다.";
+const touched = {};
+function validate(){
+  const name = $("#fName").value.trim(), comp = $("#fCompany").value.trim(), role = $("#fRole").value;
+  const phone = $("#fPhone").value.replace(/\D/g,""), em = checkEmail($("#fEmail").value);
+  const r = {
+    name: {ok:name.length>=2, msg:"이름을 2자 이상 입력해 주세요."},
+    comp: {ok:comp.length>=2, msg:"회사명을 입력해 주세요."},
+    role: {ok:!!role, msg:"직무를 선택해 주세요."},
+    email: em,
+    phone:{ok:true, msg:""},
+    sess: {ok:!!selSession, msg:"방문 예정일을 선택해 주세요."}
+  };
+  $("#hSess").textContent = (!r.sess.ok && touched.sess) ? r.sess.msg : ""; $("#hSess").className = "hint err";
+  refreshDayBadges();
+  setHint("#fName","#hName",{...r.name, msg:r.name.ok?"":r.name.msg, show:touched.name});
+  setHint("#fCompany","#hCompany",{...r.comp, msg:r.comp.ok?"":r.comp.msg, show:touched.comp});
+  $("#hRole").textContent = (!r.role.ok && touched.role) ? r.role.msg : ""; $("#hRole").className = "hint err";
+  setHint("#fEmail","#hEmail",{...r.email, show:touched.email});
+  setHint("#fPhone","#hPhone",{...r.phone, msg:r.phone.ok?"":r.phone.msg, show:touched.phone});
+  const all = Object.values(r).every(x => x.ok) && $("#fAgree").checked;
+  $("#submitBtn").disabled = !all;
+  return all;
+}
+[["#fName","name"],["#fCompany","comp"],["#fRole","role"],["#fEmail","email"],["#fPhone","phone"]].forEach(([id,k]) => {
+  $(id).addEventListener("input", () => { if (id==="#fPhone") $(id).value = fmtPhone($(id).value); validate(); });
+  $(id).addEventListener("blur", () => { touched[k] = true; validate(); });
+  $(id).addEventListener("change", () => { touched[k] = true; validate(); });
+});
+$("#fAgree").addEventListener("change", validate);
+$("#regForm").addEventListener("submit", e => { e.preventDefault(); submitForm(); });
+$("#submitBtn").addEventListener("click", submitForm);
+function submitForm(){ Object.keys({name:1,comp:1,role:1,email:1,phone:1,sess:1}).forEach(k => touched[k]=true);
+  if (!validate()) { modal("입력 내용을 확인해 주세요.<br>개인 메일(네이버·다음·지메일 등)은 사용할 수 없습니다."); return; }
+  state.user = {
+    name:$("#fName").value.trim(), company:$("#fCompany").value.trim(), role:$("#fRole").value,
+    email:$("#fEmail").value.replace(/\s/g,"").toLowerCase(), phone:$("#fPhone").value, marketing:$("#fMkt").checked, session:getSession(selSession),
+    registeredAt:new Date().toISOString()
+  };
+  go("#s-wheel",2); initArena();
+}
+
+/* ---------- PiC MAN: pixel bug-chomp roulette (1.7s) ---------- */
+/*PIX-START*/
+const PX = (() => {
+  const W = 160, H = 200, X0 = 14, X1 = 146, Y0 = 36, Y1 = 182;
+  const PW = X1 - X0, PH = Y1 - Y0, PER = 2 * (PW + PH);
+  const RUN = 1700, TRAVEL = RUN - 250;
+  const C = { wall:"#2121de", wall2:"#4a5cff", pel:"#ffb8ae", pic:"#ffd400", gog:"#3b1f6e", lens:"#7ee0ff",
+              txt:"#ffffff", yel:"#ffd400", cyan:"#00e5ff", scared:"#2121ff", door:"#ffb8de", lock:"#ffd400" };
+  const mod = v => ((v % PER) + PER) % PER;
+  function pathPt(s){ s = mod(s);
+    if (s < PW) return { x:X0 + s, y:Y0, dx:1, dy:0 };
+    s -= PW; if (s < PH) return { x:X1, y:Y0 + s, dx:0, dy:1 };
+    s -= PH; if (s < PW) return { x:X1 - s, y:Y1, dx:-1, dy:0 };
+    s -= PW; return { x:X0, y:Y1 - s, dx:0, dy:-1 };
+  }
+  const NP = CONFIG.PRIZES.length;
+  // 5 stations clockwise: top-left, top-right, right-mid, bottom-mid, left-mid
+  const ST = [36, 96, PW + PH / 2, PW + PH + PW / 2, 2 * PW + PH + PH / 2].slice(0, NP);
+  const GH = ST.map(s => { const p = pathPt(s), nx = -p.dy, ny = p.dx;
+    return { x:Math.round(p.x + nx * 20), y:Math.round(p.y + ny * 20), below: ny >= 0 }; });
+  let alt1 = 0, alt2 = 0;
+  const GCOL = CONFIG.PRIZES.map(p => p.sev === "P0" ? "#ff2a2a" : p.sev === "P1" ? (alt1++ % 2 ? "#ff8ad8" : "#ffb847") : (alt2++ % 2 ? "#5ce1a6" : "#00e5ff"));
+  const PTS = { P0:1600, P1:800, P2:400 };
+  // 3x5 pixel font
+  const F = {
+    A:".#.#.#####.##.#",B:"##.#.###.#.###.",C:".###..#..#...##",D:"##.#.##.##.###.",E:"####..##.#..###",F:"####..##.#..#..",
+    G:".###..#.##.#.##",H:"#.##.#####.##.#",I:"###.#..#..#.###",J:"..#..#..##.#.#.",K:"#.##.###.#.##.#",L:"#..#..#..#..###",
+    M:"#.########.##.#",N:"##.#.##.##.##.#",O:".#.#.##.##.#.#.",P:"##.#.###.#..#..",Q:".#.#.##.###..##",R:"##.#.###.#.##.#",
+    S:".###...#...###.",T:"###.#..#..#..#.",U:"#.##.##.##.####",V:"#.##.##.##.#.#.",W:"#.##.########.#",X:"#.##.#.#.#.##.#",
+    Y:"#.##.#.#..#..#.",Z:"###..#.#.#..###",'0':"####.##.##.####",'1':".#.##..#..#.###",'2':"##...#.#.#..###",'3':"##...#.#...###.",
+    '4':"#.##.####..#..#",'5':"####..##...###.",'6':".###..####.####",'7':"###..#.#..#..#.",'8':"####.#####.####",'9':"####.####..###.",
+    '!':".#..#..#.....#.",'.':".............#.",':':"....#.....#....",'-':"......###......",'+':"....#.###.#....",'/':"..#..#.#.#..#..",
+    '?':"##...#.#.....#.",'_':"............###",'#':"#.#####.#####.#",' ':"...............",
+  };
+  function txt(ctx, str, x, y, col, align){
+    str = String(str).toUpperCase(); const w = str.length * 4 - 1;
+    if (align === "c") x = Math.round(x - w / 2); else if (align === "r") x = x - w;
+    ctx.fillStyle = col;
+    for (const ch of str){ const g = F[ch]; if (g) for (let i = 0; i < 15; i++) if (g[i] === "#") ctx.fillRect(x + i % 3, y + (i / 3 | 0), 1, 1); x += 4; }
+  }
+  function rr(ctx, x0, y0, x1, y1, col){ // 1px rounded rect outline
+    ctx.fillStyle = col;
+    ctx.fillRect(x0 + 2, y0, x1 - x0 - 3, 1); ctx.fillRect(x0 + 2, y1, x1 - x0 - 3, 1);
+    ctx.fillRect(x0, y0 + 2, 1, y1 - y0 - 3); ctx.fillRect(x1, y0 + 2, 1, y1 - y0 - 3);
+    ctx.fillRect(x0 + 1, y0 + 1, 1, 1); ctx.fillRect(x1 - 1, y0 + 1, 1, 1); ctx.fillRect(x0 + 1, y1 - 1, 1, 1); ctx.fillRect(x1 - 1, y1 - 1, 1, 1);
+  }
+  const GB = ["....####....","..########..",".##########.",".##########.","############","############","############",
+              "############","############","############","############","############"];
+  const SK = ["##..##..##..", "..##..##..##"];
+  function ghost(ctx, cx, cy, col, frame, lx, ly, scared, blink){
+    const x0 = cx - 6, y0 = cy - 6;
+    const body = scared ? (blink ? "#ffffff" : C.scared) : col;
+    ctx.fillStyle = body;
+    for (let r = 0; r < 12; r++) for (let c = 0; c < 12; c++) if (GB[r][c] === "#") ctx.fillRect(x0 + c, y0 + r, 1, 1);
+    for (let c = 0; c < 12; c++) if (SK[frame][c] === "#") ctx.fillRect(x0 + c, y0 + 12, 1, 1);
+    if (scared){
+      ctx.fillStyle = blink ? "#ff2a2a" : C.pel;
+      ctx.fillRect(x0 + 3, y0 + 4, 2, 2); ctx.fillRect(x0 + 7, y0 + 4, 2, 2);
+      for (let c = 1; c <= 10; c++) ctx.fillRect(x0 + c, y0 + 8 + (c % 2), 1, 1);
+      return;
+    }
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(x0 + 2, y0 + 3, 3, 4); ctx.fillRect(x0 + 7, y0 + 3, 3, 4);
+    const px = lx > 0 ? 1 : 0, py = ly > 0 ? 2 : ly < 0 ? 0 : 1;
+    ctx.fillStyle = "#1a1aff"; ctx.fillRect(x0 + 2 + px, y0 + 3 + py, 2, 2); ctx.fillRect(x0 + 7 + px, y0 + 3 + py, 2, 2);
+  }
+  function pic(ctx, x, y, ang, mouth){
+    x = Math.round(x); y = Math.round(y);
+    for (let dy = -6; dy <= 6; dy++) for (let dx = -6; dx <= 6; dx++){
+      const d2 = dx * dx + dy * dy; if (d2 > 42) continue;
+      let a = Math.atan2(dy, dx) - ang; a = Math.atan2(Math.sin(a), Math.cos(a));
+      if (Math.abs(a) < mouth && d2 > 1) continue;
+      let col = C.pic;
+      if ((dy === -3 || dy === -2) && Math.abs(dx) <= 5) col = (dx === -3 || dx === -2 || dx === 1 || dx === 2) ? C.lens : C.gog; // Copilot goggles
+      ctx.fillStyle = col; ctx.fillRect(x + dx, y + dy, 1, 1);
+    }
+  }
+  const NPEL = Math.floor((PER - 4) / 8) + 1, CORN = [0, PW, PW + PH, 2 * PW + PH];
+  const START = PW + PH + PW - 20;
+  const G = { s:START, ang:Math.PI, phase:"idle", t0:0, from:0, dist:0, target:-1, prev:0,
+              eaten:new Uint8Array(NPEL), pow:new Uint8Array(4), score:0, lock:-1, dashT0:0, dx0:0, dy0:0, eatT:0, gone:-1, px:0, py:0 };
+  const hooks = { lock(){}, eat(){} };
+  function reset(){ Object.assign(G, { s:START, ang:Math.PI, phase:"idle", target:-1, score:0, lock:-1, gone:-1 }); G.eaten.fill(0); G.pow.fill(0); }
+  function startRun(idx, now){ G.target = idx; G.from = G.s; G.prev = G.s; G.dist = PER + mod(ST[idx] - G.s); G.t0 = now; G.phase = "run"; }
+  function crossed(ps, a, b){ return (ps > a && ps <= b) || (ps + PER > a && ps + PER <= b); }
+  function update(now){
+    if (G.phase === "run"){
+      const tr = Math.min(1, (now - G.t0) / TRAVEL), e = 1 - Math.pow(1 - tr, 3);
+      const s = G.from + G.dist * e, a = mod(G.prev), b = a + (s - G.prev);
+      for (let k = 0; k < NPEL; k++) if (!G.eaten[k] && crossed(4 + k * 8, a, b)){ G.eaten[k] = 1; G.score += 10; }
+      CORN.forEach((cs, k) => { if (!G.pow[k] && crossed(cs, a, b)){ G.pow[k] = 1; G.score += 50; } });
+      G.prev = s; G.s = mod(s);
+      const p = pathPt(G.s); G.ang = Math.atan2(p.dy, p.dx); G.px = p.x; G.py = p.y;
+      let lk = -1; ST.forEach((st, i) => { const d = Math.abs(mod(G.s - st + PER / 2) - PER / 2); if (d < 10) lk = i; });
+      if (tr >= 1) lk = G.target;
+      if (lk !== G.lock){ G.lock = lk; hooks.lock(lk, tr); }
+      if (tr >= 1){ G.phase = "dash"; G.dashT0 = now; G.dx0 = p.x; G.dy0 = p.y; }
+    } else if (G.phase === "dash"){
+      const d = Math.min(1, (now - G.dashT0) / 250), g = GH[G.target];
+      G.px = G.dx0 + (g.x - G.dx0) * d; G.py = G.dy0 + (g.y - G.dy0) * d;
+      G.ang = Math.atan2(g.y - G.dy0, g.x - G.dx0);
+      if (d >= 1){ G.phase = "eat"; G.eatT = now; G.gone = G.target; G.score += PTS[CONFIG.PRIZES[G.target].sev] || 400; hooks.eat(G.target); }
+    } else if (G.phase === "idle"){
+      const p = pathPt(G.s); G.px = p.x; G.py = p.y;
+    }
+  }
+  function draw(ctx, now){
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+    // maze walls (double line)
+    rr(ctx, X0 - 11, Y0 - 11, X1 + 11, Y1 + 11, C.wall); rr(ctx, X0 - 9, Y0 - 9, X1 + 9, Y1 + 9, C.wall2);
+    rr(ctx, X0 + 9, Y0 + 9, X1 - 9, Y1 - 9, C.wall2);   rr(ctx, X0 + 11, Y0 + 11, X1 - 11, Y1 - 11, C.wall);
+    // bug house
+    const hx0 = 58, hy0 = 97, hx1 = 102, hy1 = 121;
+    rr(ctx, hx0, hy0, hx1, hy1, C.wall2); ctx.fillStyle = C.door; ctx.fillRect(74, hy0, 12, 2);
+    txt(ctx, "BUG", 80, 103, "#8f8fff", "c"); txt(ctx, "HOUSE", 80, 110, "#8f8fff", "c");
+    // pellets
+    ctx.fillStyle = C.pel;
+    for (let k = 0; k < NPEL; k++) if (!G.eaten[k]){ const p = pathPt(4 + k * 8); if (CORN.some(c => Math.abs(mod(4 + k * 8 - c + PER / 2) - PER / 2) < 5)) continue; ctx.fillRect(p.x - 1, p.y - 1, 2, 2); }
+    if (Math.floor(now / 220) % 2 === 0) CORN.forEach((cs, k) => { if (!G.pow[k]){ const p = pathPt(cs); ctx.fillRect(p.x - 2, p.y - 2, 4, 4); ctx.fillRect(p.x - 1, p.y - 3, 2, 6); ctx.fillRect(p.x - 3, p.y - 1, 6, 2); } });
+    // bug ghosts
+    const fr = Math.floor(now / 140) % 2;
+    GH.forEach((g, i) => {
+      if (G.gone === i) return;
+      const scared = G.phase === "dash" && i === G.target;
+      const lx = Math.sign(G.px - g.x), ly = Math.sign(G.py - g.y);
+      const bob = scared ? 0 : (Math.floor(now / 300 + i) % 2);
+      ghost(ctx, g.x, g.y + bob, GCOL[i], fr, lx, ly, scared, scared && Math.floor(now / 60) % 2 === 0);
+      if (G.lock === i && G.phase === "run"){ // target-lock brackets
+        ctx.fillStyle = C.lock; const a = g.x - 9, b = g.y - 9, c = g.x + 9, d = g.y + 9;
+        [[a,b,1,1],[c,b,-1,1],[a,d,1,-1],[c,d,-1,-1]].forEach(([x,y,sx,sy]) => { ctx.fillRect(Math.min(x, x + sx * 3), y, 4, 1); ctx.fillRect(x, Math.min(y, y + sy * 3), 1, 4); });
+      }
+    });
+    // PiC MAN
+    let mouth = 0.55;
+    if (G.phase === "run") mouth = 0.08 + 0.6 * Math.abs(Math.sin(now / 32));
+    else if (G.phase === "dash") mouth = 0.9;
+    else if (G.phase === "eat") mouth = now - G.eatT < 200 ? 0.05 : 0.5;
+    else mouth = 0.15 + 0.45 * Math.abs(Math.sin(now / 260));
+    pic(ctx, G.px, G.py, G.ang, mouth);
+    // centre messages
+    if (G.phase === "idle" && Math.floor(now / 450) % 2 === 0) txt(ctx, "READY!", 80, 128, C.yel, "c");
+    if (G.phase === "eat"){
+      const t = now - G.eatT, g = GH[G.target];
+      if (t < 1400) txt(ctx, String(PTS[CONFIG.PRIZES[G.target].sev] || 400), g.x, Math.round(g.y - 14 - t / 120), C.cyan, "c");
+      if (Math.floor(t / 250) % 2 === 0) txt(ctx, "BUG FIXED!", 80, 128, C.cyan, "c");
+    }
+    // HUD
+    const left = G.phase === "run" || G.phase === "dash" ? Math.max(0, RUN - (now - G.t0)) : (G.phase === "eat" ? 0 : RUN);
+    txt(ctx, "1UP", 6, 4, C.txt); txt(ctx, String(G.score).padStart(5, "0"), 6, 11, C.txt);
+    txt(ctx, "TIME", 80, 4, C.txt, "c"); txt(ctx, (left / 1000).toFixed(2), 80, 11, C.yel, "c");
+    txt(ctx, "HI-SCORE", 154, 4, C.txt, "r"); txt(ctx, "33000", 154, 11, C.txt, "r");
+    txt(ctx, "G-STAR 2026", 4, 195, "#6c6cff"); txt(ctx, "CREDIT 01", 156, 195, "#6c6cff", "r");
+    if (G.phase === "eat" && now - G.eatT < 110){ ctx.fillStyle = "rgba(255,255,255,.65)"; ctx.fillRect(0, 0, W, H); }
+  }
+  return { W, H, GH, ST, GCOL, RUN, TRAVEL, G, hooks, reset, startRun, update, draw };
+})();
+/*PIX-END*/
+const N = CONFIG.PRIZES.length;
+const RUN_MS = PX.RUN;
+let spun = false;
+const pixCtx = $("#pix").getContext("2d");
+function term(t){ $("#term").textContent = t; }
+function initArena(){
+  const box = $("#tags"); box.innerHTML = "";
+  CONFIG.PRIZES.forEach((p, i) => {
+    const g = PX.GH[i], d = document.createElement("div");
+    d.className = "tagp"; d.id = "tg" + i; d.style.setProperty("--sc", PX.GCOL[i]);
+    d.style.left = (g.x / PX.W * 100) + "%"; d.style.top = ((g.below ? g.y + 13 : g.y - 13) / PX.H * 100) + "%";
+    d.innerHTML = `<b>${p.bugIcon}${p.sev}</b> ${p.icon}<span class="fx"> ✔FIXED</span>`;
+    box.appendChild(d);
+  });
+}
+initArena();
+function pickWeighted(){
+  const total = CONFIG.PRIZES.reduce((s,p) => s+p.weight, 0);
+  const buf = new Uint32Array(1); crypto.getRandomValues(buf);
+  let r = buf[0] / 4294967296 * total;
+  for (let i=0;i<N;i++){ r -= CONFIG.PRIZES[i].weight; if (r < 0) return i; }
+  return N-1;
+}
+PX.hooks.lock = (i, tr) => {
+  document.querySelectorAll(".tagp").forEach((el, j) => el.classList.toggle("lock", j === i));
+  if (i >= 0){ const p = CONFIG.PRIZES[i]; term(`> scan [${p.alert}] ${p.bug}…`); if (tr > 0.55 && navigator.vibrate) navigator.vibrate(6); }
+};
+PX.hooks.eat = i => {
+  const p = CONFIG.PRIZES[i];
+  $("#tg" + i).classList.add("dead"); const a = $("#arcade"); a.classList.remove("shake"); void a.offsetWidth; a.classList.add("shake");
+  term(`> @copilot /fix → [${p.alert}] ${p.bug}Exception FIXED ✔`);
+  if (navigator.vibrate) navigator.vibrate([40,30,90]);
+};
+(function loop(now){
+  if ($("#s-wheel").classList.contains("active")){ PX.update(now || performance.now()); PX.draw(pixCtx, now || performance.now()); }
+  requestAnimationFrame(loop);
+})();
+$("#spinBtn").addEventListener("click", () => {
+  if (spun) return; spun = true;
+  const btn = $("#spinBtn"); btn.disabled = true; btn.innerHTML = '<span class="dot"></span>CHOMPING…';
+  const idx = pickWeighted(), p = CONFIG.PRIZES[idx];
+  term("> PiC MAN: bug queue 5건 탐색 중…");
+  PX.startRun(idx, performance.now());
+  setTimeout(() => {
+    $("#winSub").textContent = `${p.sev} ${p.sevName} · ${p.bug}Exception FIXED`;
+    $("#winLoot").textContent = `👾 보상: ${p.icon} ${p.name}`;
+    $("#win").classList.add("on");
+  }, RUN_MS + 700);
+  setTimeout(() => onWin(idx), RUN_MS + 2600);
+});
+
+
+/* ---------- result + coupon ---------- */
+function makeCode(sid){
+  const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", buf = new Uint32Array(8); crypto.getRandomValues(buf);
+  const s = Array.from(buf, n => A[n % A.length]).join("");
+  return `GSTAR-${sid.replace(/\D/g,"")}-${s.slice(0,4)}-${s.slice(4)}`;
+}
+function onWin(idx){
+  state.prize = CONFIG.PRIZES[idx];
+  const p = state.prize, u = state.user;
+  const prior = getIssued(u.email, u.session.id);
+  $("#practiceTag").style.display = prior ? "inline-block" : "none";
+  $("#resTitle").innerHTML = `🏆 ${p.sev} ${p.sevName} 버그 처치!`;
+  $("#fixedLine").innerHTML = `✔ ${p.bug}Exception FIXED by @copilot [CHOMP]<br>🪂 보급품: ${p.icon} ${p.name}` +
+    (prior ? `<br><span style="color:#e3b341">📨 ${u.session.label} 쿠폰은 이미 당첨되셨어요! 이번 판은 연습 경기이며, 이미 당첨되신 쿠폰을 메일로 재발송해드립니다.</span>` : "");
+  confetti();
+  go("#s-result",3);
+  $("#replayBtn").style.display = "none";
+  if (prior){ showCoupon(prior, "dup"); sendMail(true); return; }
+  if (p.key === "drink"){ $("#drinkPick").style.display = "block"; }
+  else issueCoupon();
+}
+document.querySelectorAll("#drinkPick .drink").forEach(btn => btn.addEventListener("click", () => {
+  document.querySelectorAll("#drinkPick .drink").forEach(b => b.classList.remove("sel"));
+  btn.classList.add("sel"); state.drink = btn.dataset.d; $("#drinkConfirm").disabled = false;
+}));
+$("#drinkConfirm").addEventListener("click", () => { $("#drinkPick").style.display = "none"; issueCoupon(); });
+
+function prizeLabel(){
+  return state.prize.key === "drink" ? `${state.drink} 1잔` : state.prize.name;
+}
+function showCoupon(rec, mode){
+  state.rec = rec;
+  $("#cItem").textContent = `${rec.icon} ${rec.prize}`;
+  $("#cSub").textContent = rec.sub;
+  $("#cCode").textContent = rec.code;
+  $("#cSev").textContent = `${rec.sev} ${rec.sevName} · ${rec.bug}Exception FIXED · ${rec.dayLabel} 전용`;
+  $("#cSev").setAttribute("style", sevStyle(rec.sev));
+  $("#cWho").textContent = `${state.user.name} · ${state.user.company} · ${rec.email}`;
+  $("#eventInfo2").innerHTML = infoHTML(state.user.session);
+  $("#couponArea").style.display = "block";
+  $("#replayBtn").style.display = "block";
+  state.isDup = (mode === "dup");
+  $("#resendBtn").style.display = "block";
+}
+function issueCoupon(){
+  const u = state.user, p = state.prize;
+  const rec = {
+    email:u.email, sid:u.session.id, dayLabel:u.session.label, code:makeCode(u.session.id),
+    prize:prizeLabel(), icon:p.icon, sev:p.sev, sevName:p.sevName, bug:p.bug,
+    sub: p.key === "drink" ? "칵테일 · 하이볼 · 수제맥주 중 선택" : p.sub, at:Date.now()
+  };
+  saveIssued(rec);              // 기기 내 1차 잠금 (재시도해도 같은 날짜 쿠폰은 1장)
+  showCoupon(rec, "new");
+  sendMail();
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function emailHTML(resend){
+  const u = state.user, v = u.session, r = state.rec;
+  const headline = resend ? `${esc(u.name)}님, 이미 당첨되신 ${esc(v.label)} 쿠폰을 재발송해드립니다 📨` : `${esc(u.name)}님, ${esc(v.label)} 쿠폰이 발행되었습니다 🎉`;
+  const notice = resend ? `<div style="background:#3b2e0a;border:1px solid #e3b341;color:#f2cc60;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;margin-bottom:16px">📌 쿠폰은 이메일당 행사일별 1장입니다. 이미 당첨되신 쿠폰을 재발송해드립니다. 아래 쿠폰을 현장에서 사용해 주세요.</div>` : "";
+  return `<div style="font-family:Apple SD Gothic Neo,Malgun Gothic,sans-serif;max-width:560px;margin:0 auto;background:#0d1117;color:#e6edf3;border-radius:16px;overflow:hidden">
+  <div style="padding:28px 24px;background:linear-gradient(135deg,#2d1b4e,#123222)">
+    <div style="font-size:12px;letter-spacing:2px;color:#8b949e;font-weight:700">GITHUB COPILOT × G-STAR</div>
+    <div style="font-size:22px;font-weight:800;margin-top:6px">${headline}</div>
+  </div>
+  <div style="padding:24px">${notice}
+    <div style="border:2px dashed #a371f7;border-radius:14px;padding:20px;text-align:center">
+      <div style="font-size:12px;color:#ff7b72;font-weight:700;font-family:Consolas,monospace">🎯 ${esc(r.sev)} ${esc(r.sevName)} · ${esc(r.bug)}Exception FIXED [CHOMP]</div>
+      <div style="font-size:13px;color:#8b949e;margin-top:6px">🪂 보급품 (Airdrop Loot)</div>
+      <div style="font-size:22px;font-weight:800;margin:6px 0">${esc(r.icon)} ${esc(r.prize)}</div>
+      <div style="font-family:Consolas,monospace;font-size:22px;font-weight:800;letter-spacing:2px;color:#3fb950">${esc(r.code)}</div>
+      <div style="font-size:12px;color:#e3b341;margin-top:8px;font-weight:700">${esc(v.label)} ${esc(v.venue)} 전용 · 이메일당 1일 1장</div>
+      <div style="font-size:12px;color:#8b949e;margin-top:4px">${esc(CONFIG.COUPON_VALID)}</div>
+    </div>
+    <table style="width:100%;margin-top:20px;font-size:14px;color:#e6edf3;border-collapse:collapse">
+      <tr><td style="color:#8b949e;padding:6px 0;width:60px">행사</td><td>${esc(CONFIG.EVENT_NAME)}</td></tr>
+      <tr><td style="color:#8b949e;padding:6px 0">일시</td><td>${esc(v.time)}</td></tr>
+      <tr><td style="color:#8b949e;padding:6px 0">장소</td><td><b>${esc(v.venue)}</b><br>${esc(v.address)}<br><a style="color:#58a6ff" href="${esc(mapURL(v))}">지도 보기</a></td></tr>
+      <tr><td style="color:#8b949e;padding:6px 0">혜택</td><td>🍺 맥주 · 🌮 기본 타코 · 🫓 퀘사디아 무료 제공<br><span style="color:#e3b341">기업 인증 방문객 only</span></td></tr>
+    </table>
+    <p style="font-size:13px;color:#8b949e;line-height:1.6;margin-top:18px">입장 시 본 메일을 스태프에게 보여주세요. 쿠폰은 표시된 날짜에 1회만 사용 가능합니다.</p>
+  </div></div>`;
+}
+async function sendMail(resend){
+  resend = resend === true || (resend === undefined && state.isDup);
+  const st = $("#mailStatus"), r = state.rec, u = state.user;
+  st.className = "status"; st.textContent = resend ? "📨 이미 당첨되신 쿠폰을 재발송해드리는 중…" : "📨 쿠폰 메일을 보내는 중…";
+  const payload = {
+    to: u.email, day: u.session.id, resend: resend, dayLabel: u.session.label, dedupKey: `${u.session.id}|${u.email}`,
+    subject: resend
+      ? `[재발송][GitHub Copilot × G-STAR] 이미 당첨되신 ${u.session.label} 쿠폰을 재발송해드립니다 — ${r.prize} (${r.code})`
+      : `[GitHub Copilot × G-STAR] ${u.session.label} ${u.name}님 쿠폰 발행 — ${r.prize} (${r.code})`,
+    html: emailHTML(resend),
+    user: u, prize: r.prize, coupon: r.code, bug: `${r.sev} ${r.sevName} · ${r.bug}Bug`,
+    venue: u.session.venue, address: u.session.address, time: u.session.time
+  };
+  if (!CONFIG.MAIL_ENDPOINT){
+    console.info("[DEMO] MAIL_ENDPOINT 미설정 — 발송 payload:", payload);
+    setTimeout(() => { st.className = "status err";
+      st.textContent = "⚠️ 데모 모드: 메일 발송 서버가 연결되지 않았습니다. 이 화면을 캡처해 스태프에게 보여주세요."; }, 600);
+    return;
+  }
+  try{
+    const res = await fetch(CONFIG.MAIL_ENDPOINT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)});
+    if (res.status === 409){
+      // 서버(흐름)에 이미 같은 날짜 쿠폰이 있음 → 서버 쿠폰으로 교체
+      let j = {}; try { j = await res.json(); } catch(e){}
+      const rec = Object.assign({}, r, j.coupon ? {code:j.coupon} : {}, j.prize ? {prize:j.prize} : {});
+      saveIssued(rec); $("#practiceTag").style.display = "inline-block"; showCoupon(rec, "dup");
+      st.className = "status ok"; st.textContent = `📨 ${u.session.label} 쿠폰은 이미 당첨되셨어요. 이미 당첨되신 쿠폰(${rec.code})을 ${u.email} 로 재발송해드렸습니다.`;
+      return;
+    }
+    if (!res.ok) throw new Error(res.status);
+    st.className = "status ok";
+    st.textContent = resend
+      ? `📨 이미 당첨되신 ${u.session.label} 쿠폰(${r.code})을 ${u.email} 로 재발송해드렸습니다. 받은편지함(또는 스팸함)을 확인해 주세요.`
+      : `✅ ${u.email} 로 ${u.session.label} 쿠폰과 행사장 안내를 보냈습니다. 받은편지함(또는 스팸함)을 확인해 주세요.`;
+  }catch(e){
+    st.className = "status err"; st.textContent = "⚠️ 메일 발송에 실패했습니다. '메일 다시 보내기'를 누르거나 이 화면을 스태프에게 보여주세요.";
+  }
+}
+$("#resendBtn").addEventListener("click", () => sendMail());
+
+/* ---------- replay (practice) ---------- */
+function resetArena(){
+  spun = false; PX.reset();
+  $("#arcade").classList.remove("shake"); $("#win").classList.remove("on"); term("> READY PLAYER 1_");
+  const b = $("#spinBtn"); b.disabled = false; b.innerHTML = '<span class="dot"></span>BUG 잡기 GO';
+  $("#drinkPick").style.display = "none"; $("#couponArea").style.display = "none"; $("#replayBtn").style.display = "none";
+  document.querySelectorAll("#drinkPick .drink").forEach(x => x.classList.remove("sel")); $("#drinkConfirm").disabled = true; state.drink = null;
+  initArena();
+}
+$("#replayBtn").addEventListener("click", () => { resetArena(); go("#s-wheel",2); });
+
+/* ---------- confetti ---------- */
+function confetti(){
+  const c = $("#confetti"), x = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  const cols = ["#a371f7","#3fb950","#58a6ff","#f778ba","#e3b341"];
+  const ps = Array.from({length:160}, () => ({x:Math.random()*c.width, y:-20-Math.random()*c.height*.5,
+    vx:(Math.random()-.5)*4, vy:2+Math.random()*4, s:4+Math.random()*6, r:Math.random()*6, c:cols[Math.floor(Math.random()*5)]}));
+  let t = 0;
+  (function f(){ x.clearRect(0,0,c.width,c.height);
+    ps.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.r+=.1;
+      x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle=p.c; x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); x.restore(); });
+    if (++t < 220) requestAnimationFrame(f); else x.clearRect(0,0,c.width,c.height); })();
+}
+</script>
+</body>
+</html>
