@@ -57,4 +57,4 @@ jobs:
           app-name: 'nacho'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1C821D4A72A64B5FAE26C0915D4DAE0A }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EECDDB5F369B4455995951FFDD44D36A }}
