@@ -363,7 +363,7 @@ input:focus,select:focus{border-color:#f2a900}
       <input type="email" id="fEmail" autocomplete="email" inputmode="email" placeholder="name@company.com" maxlength="80">
       <div class="hint" id="hEmail">네이버·다음·지메일 등 개인 메일은 사용할 수 없습니다.</div>
 
-      <label for="fPhone">휴대폰 번호 <span style="color:var(--muted);font-weight:500">(선택)</span></label>
+      <label for="fPhone">휴대폰 번호 <span class="req">(선택)</span></label>
       <input type="tel" id="fPhone" autocomplete="tel" inputmode="numeric" placeholder="010-1234-5678" maxlength="13">
       <div class="hint" id="hPhone"></div>
 
@@ -567,7 +567,7 @@ function validate(){
     comp: {ok:comp.length>=2, msg:"회사명을 입력해 주세요."},
     role: {ok:!!role, msg:"직무를 선택해 주세요."},
     email: em,
-    phone:{ok:true, msg:""},
+    phone:{ok:/^01[016789]\d{7,8}$/.test(phone), msg:"휴대폰 번호를 정확히 입력해 주세요. (예: 010-1234-5678)"},
     sess: {ok:!!selSession, msg:"방문 예정일을 선택해 주세요."}
   };
   $("#hSess").textContent = (!r.sess.ok && touched.sess) ? r.sess.msg : ""; $("#hSess").className = "hint err";
