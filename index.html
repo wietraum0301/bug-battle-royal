@@ -596,6 +596,7 @@ function submitForm(){ Object.keys({name:1,comp:1,role:1,email:1,phone:1,sess:1}
     email:$("#fEmail").value.replace(/\s/g,"").toLowerCase(), phone:$("#fPhone").value, marketing:$("#fMkt").checked, session:getSession(selSession),
     registeredAt:new Date().toISOString()
   };
+  state.code = null;
   go("#s-wheel",2); initArena();
 }
 
@@ -792,10 +793,42 @@ PX.hooks.eat = i => {
   if ($("#s-wheel").classList.contains("active")){ PX.update(now || performance.now()); PX.draw(pixCtx, now || performance.now()); }
   requestAnimationFrame(loop);
 })();
-$("#spinBtn").addEventListener("click", () => {
+/* ---------- 경품 풀 추첨 (서버) ----------
+   200개 고정 풀(하몽 16 · 소세지 60 · 드링크 124)을 흐름이 순서대로 배정하고,
+   200개가 모두 소진되면 처음부터 다시 시작(리셋)합니다. 등록 정보는 이 단계에서 SharePoint에 저장됩니다. */
+const POOL_KEY = { J:"jamon", S:"sausage", D:"drink" };
+function idxForKey(key){
+  const c = CONFIG.PRIZES.map((p,i) => p.key === key ? i : -1).filter(i => i >= 0);
+  const b = new Uint32Array(1); crypto.getRandomValues(b); return c[b[0] % c.length];
+}
+async function drawFromPool(){
+  const u = state.user;
+  if (!state.code) state.code = makeCode(u.session.id);
+  const payload = { action:"draw", to:u.email, day:u.session.id, dayLabel:u.session.label, coupon:state.code, user:u };
+  for (let attempt = 0; attempt < 2; attempt++){
+    const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 25000);
+    try{
+      const res = await fetch(CONFIG.MAIL_ENDPOINT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload), signal:ac.signal});
+      clearTimeout(tm);
+      if (res.ok){ const j = await res.json(); const k = POOL_KEY[String(j.code || "").trim().toUpperCase()]; if (k) return idxForKey(k); }
+    }catch(e){ clearTimeout(tm); }
+  }
+  return -1;
+}
+$("#spinBtn").addEventListener("click", async () => {
   if (spun) return; spun = true;
-  const btn = $("#spinBtn"); btn.disabled = true; btn.innerHTML = '<span class="dot"></span>CHOMPING…';
-  const idx = pickWeighted(), p = CONFIG.PRIZES[idx];
+  const btn = $("#spinBtn"); btn.disabled = true; btn.innerHTML = '<span class="dot"></span>SCANNING…';
+  term("> PiC MAN: 버그 위치 스캔 중…");
+  const u = state.user, practice = !!getIssued(u.email, u.session.id) || !CONFIG.MAIL_ENDPOINT;
+  const idx = practice ? pickWeighted() : await drawFromPool();
+  if (idx < 0){
+    spun = false; btn.disabled = false; btn.innerHTML = '<span class="dot"></span>다시 시도';
+    term("> 서버 연결 지연 — 다시 시도해 주세요");
+    modal("서버 연결이 지연되고 있어요.<br>잠시 후 <b>다시 시도</b>를 눌러 주세요.");
+    return;
+  }
+  const p = CONFIG.PRIZES[idx];
+  btn.innerHTML = '<span class="dot"></span>CHOMPING…';
   term("> PiC MAN: bug queue 5건 탐색 중…");
   PX.startRun(idx, performance.now());
   setTimeout(() => {
@@ -854,7 +887,7 @@ function showCoupon(rec, mode){
 function issueCoupon(){
   const u = state.user, p = state.prize;
   const rec = {
-    email:u.email, sid:u.session.id, dayLabel:u.session.label, code:makeCode(u.session.id),
+    email:u.email, sid:u.session.id, dayLabel:u.session.label, code:state.code || makeCode(u.session.id),
     prize:prizeLabel(), icon:p.icon, sev:p.sev, sevName:p.sevName, bug:p.bug,
     sub: p.key === "drink" ? "칵테일 · 하이볼 · 수제맥주 중 선택" : p.sub, at:Date.now()
   };
